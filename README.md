@@ -13,7 +13,7 @@
 
 ### Description
 
-TicTacAI is a modern iOS tic-tac-toe game that combines classic gameplay with cutting-edge AI technology. Players can enjoy local two-player matches or challenge themselves against four different AI opponents: Easy (random moves), Hard (unbeatable Minimax algorithm), and Online (OpenAI GPT-3.5-turbo integration). The app features comprehensive statistics tracking, customizable settings, and a clean UIKit interface designed for quick, engaging gameplay sessions.
+TicTacAI is a modern iOS tic-tac-toe game that combines classic gameplay with cutting-edge AI technology. Players can enjoy local two-player matches or challenge themselves against three different AI opponents: Easy (random moves), Hard (unbeatable Minimax algorithm), and Online (OpenAI GPT-3.5-turbo integration). The app features comprehensive statistics tracking, customizable settings, and a clean UIKit interface designed for quick, engaging gameplay sessions.
 
 ### App Evaluation
 
