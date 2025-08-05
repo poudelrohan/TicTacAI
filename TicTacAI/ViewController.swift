@@ -23,7 +23,8 @@ class HomeViewController: UIViewController {
     
     private func setupUI() {
         print("🏠 Setting up HomeViewController UI")
-        title = "TicTacAI"
+        // Remove navigation title since we have a custom label
+        title = ""
         
         // Check if outlets are connected
         guard titleLabel != nil else {
@@ -93,17 +94,17 @@ class HomeViewController: UIViewController {
         let alert = UIAlertController(title: "Select Difficulty", message: "Choose AI difficulty level", preferredStyle: .actionSheet)
         
         // Easy AI
-        alert.addAction(UIAlertAction(title: "🟢 Easy", style: .default) { _ in
+        alert.addAction(UIAlertAction(title: "🟢 Easy (Random Moves)", style: .default) { _ in
             self.navigateToGame(mode: .singlePlayerEasy)
         })
         
         // Hard AI
-        alert.addAction(UIAlertAction(title: "🔴 Hard", style: .default) { _ in
+        alert.addAction(UIAlertAction(title: "🔴 Hard (Minimax Algo)", style: .default) { _ in
             self.navigateToGame(mode: .singlePlayerHard)
         })
         
         // Online AI
-        alert.addAction(UIAlertAction(title: "🌐 Online AI", style: .default) { _ in
+        alert.addAction(UIAlertAction(title: "🌐 Online AI (WIP ChatGPT API)", style: .default) { _ in
             self.navigateToGame(mode: .singlePlayerOnline)
         })
         

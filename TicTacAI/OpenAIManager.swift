@@ -20,16 +20,27 @@ class OpenAIManager {
     func getAIMove(for board: [Player?], completion: @escaping (Result<Int, Error>) -> Void) {
         // Convert board to string representation
         let boardString = boardToString(board)
+        print("🔍 Board sent to OpenAI:")
+        print(boardString)
         
         // Create the prompt
         let prompt = createTicTacToePrompt(boardString: boardString)
+        print("🤖 Full prompt sent to OpenAI:")
+        print(prompt)
         
         // Make API request
         makeOpenAIRequest(prompt: prompt) { result in
             switch result {
             case .success(let response):
                 if let position = self.parseAIResponse(response) {
-                    completion(.success(position))
+                    // Validate the position is actually available
+                    if board[position] == nil {
+                        print("✅ OpenAI suggested valid empty position: \(position)")
+                        completion(.success(position))
+                    } else {
+                        print("❌ OpenAI suggested occupied position \(position) - board[\(position)] = \(board[position]?.rawValue ?? "nil")")
+                        completion(.failure(OpenAIError.invalidResponse))
+                    }
                 } else {
                     completion(.failure(OpenAIError.invalidResponse))
                 }
@@ -42,6 +53,8 @@ class OpenAIManager {
     // MARK: - Private Helper Methods
     private func boardToString(_ board: [Player?]) -> String {
         var result = ""
+        var availablePositions: [Int] = []
+        
         for i in 0..<9 {
             if i % 3 == 0 && i != 0 {
                 result += "\n"
@@ -53,30 +66,36 @@ class OpenAIManager {
             case .O:
                 result += "O"
             case nil:
-                result += "\(i)"
+                result += "-"
+                availablePositions.append(i)
             }
             
             if i % 3 != 2 {
                 result += "|"
             }
         }
+        
+        result += "\n\nAVAILABLE POSITIONS: \(availablePositions.map(String.init).joined(separator: ", "))"
         return result
     }
     
     private func createTicTacToePrompt(boardString: String) -> String {
         return """
-        You are an expert Tic-Tac-Toe AI player. You are playing as 'O' and the human is 'X'.
+        You are playing Tic-Tac-Toe as player 'O'. The human is player 'X'.
         
-        Current board state (numbers represent empty positions):
+        Current board:
         \(boardString)
         
-        Rules:
-        1. You are 'O', human is 'X'
-        2. Choose the best move for 'O'
-        3. Respond with ONLY the position number (0-8)
-        4. Priority: Win > Block opponent win > Strategic position
+        CRITICAL INSTRUCTIONS:
+        - X = Human's move (OCCUPIED, cannot play here)
+        - O = Your previous move (OCCUPIED, cannot play here)  
+        - - = Empty space (you CAN play here)
+        - You must choose from the AVAILABLE POSITIONS list only
+        - If you suggest an occupied position, you lose the game
         
-        What position (0-8) should 'O' play next? Respond with only the number.
+        Strategy priority: 1) Win immediately 2) Block human from winning 3) Take center/corners
+        
+        Respond with ONLY one number from the available positions.
         """
     }
     
@@ -138,11 +157,15 @@ class OpenAIManager {
     }
     
     private func parseAIResponse(_ response: String) -> Int? {
+        print("🔍 Raw OpenAI response: '\(response)'")
+        
         // Extract number from response
         let cleanResponse = response.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("🧹 Cleaned response: '\(cleanResponse)'")
         
         // Try to parse as direct number
         if let position = Int(cleanResponse), position >= 0 && position <= 8 {
+            print("✅ Parsed position directly: \(position)")
             return position
         }
         
@@ -150,11 +173,14 @@ class OpenAIManager {
         let numbers = cleanResponse.compactMap { char in
             char.isNumber ? Int(String(char)) : nil
         }
+        print("🔢 Numbers found: \(numbers)")
         
         if let firstNumber = numbers.first, firstNumber >= 0 && firstNumber <= 8 {
+            print("✅ Parsed position from numbers: \(firstNumber)")
             return firstNumber
         }
         
+        print("❌ Failed to parse any valid position")
         return nil
     }
 }
