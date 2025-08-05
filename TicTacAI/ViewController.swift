@@ -90,22 +90,30 @@ class HomeViewController: UIViewController {
     
     // MARK: - Navigation
     private func showGameModeSelection() {
-        let alert = UIAlertController(title: "Single Player", message: "Choose difficulty level", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Select Difficulty", message: "Choose AI difficulty level", preferredStyle: .actionSheet)
         
-        alert.addAction(UIAlertAction(title: "Easy", style: .default) { _ in
+        // Easy AI
+        alert.addAction(UIAlertAction(title: "🟢 Easy", style: .default) { _ in
             self.navigateToGame(mode: .singlePlayerEasy)
         })
         
-        alert.addAction(UIAlertAction(title: "Hard", style: .default) { _ in
+        // Hard AI
+        alert.addAction(UIAlertAction(title: "🔴 Hard", style: .default) { _ in
             self.navigateToGame(mode: .singlePlayerHard)
         })
         
+        // Online AI
+        alert.addAction(UIAlertAction(title: "🌐 Online AI", style: .default) { _ in
+            self.navigateToGame(mode: .singlePlayerOnline)
+        })
+        
+        // Cancel
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         
-        // For iPad
+        // For iPad support
         if let popover = alert.popoverPresentationController {
-            popover.sourceView = singlePlayerButton
-            popover.sourceRect = singlePlayerButton.bounds
+            popover.sourceView = self.view
+            popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
         }
         
         present(alert, animated: true)
@@ -138,17 +146,15 @@ class HomeViewController: UIViewController {
     }
     
     private func navigateToStatistics() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let statsVC = storyboard.instantiateViewController(withIdentifier: "StatisticsViewController") as? StatisticsViewController {
-            navigationController?.pushViewController(statsVC, animated: true)
-        }
+        // Create StatisticsViewController programmatically (no storyboard needed)
+        let statsVC = StatisticsViewController()
+        navigationController?.pushViewController(statsVC, animated: true)
     }
     
     private func navigateToSettings() {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let settingsVC = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController {
-            navigationController?.pushViewController(settingsVC, animated: true)
-        }
+        // Create SettingsViewController programmatically (no storyboard needed)
+        let settingsVC = SettingsViewController()
+        navigationController?.pushViewController(settingsVC, animated: true)
     }
 }
 

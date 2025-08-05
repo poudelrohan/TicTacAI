@@ -20,6 +20,7 @@ enum GameMode {
     case twoPlayer
     case singlePlayerEasy
     case singlePlayerHard
+    case singlePlayerOnline
 }
 
 enum GameState: Equatable {
@@ -54,7 +55,7 @@ class GameModel {
             currentPlayer = currentPlayer.opposite
             
             // If it's single player mode and now it's O's turn (AI), make AI move
-            if (gameMode == .singlePlayerEasy || gameMode == .singlePlayerHard) && currentPlayer == .O {
+            if (gameMode == .singlePlayerEasy || gameMode == .singlePlayerHard || gameMode == .singlePlayerOnline) && currentPlayer == .O {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     self.makeAIMove()
                 }
@@ -67,13 +68,25 @@ class GameModel {
     private func makeAIMove() {
         let aiPosition: Int
         
+        // Show loading for online AI
+        if gameMode == .singlePlayerOnline {
+            NotificationCenter.default.post(name: NSNotification.Name("ShowAILoading"), object: nil)
+        }
+        
         switch gameMode {
         case .singlePlayerEasy:
             aiPosition = getRandomMove()
         case .singlePlayerHard:
             aiPosition = getMinimaxMove()
+        case .singlePlayerOnline:
+            aiPosition = getOnlineAIMove()
         default:
             return
+        }
+        
+        // Hide loading for online AI
+        if gameMode == .singlePlayerOnline {
+            NotificationCenter.default.post(name: NSNotification.Name("HideAILoading"), object: nil)
         }
         
         if aiPosition != -1 {
@@ -83,6 +96,9 @@ class GameModel {
             if gameState == .ongoing {
                 currentPlayer = currentPlayer.opposite
             }
+            
+            // Notify that AI move was made (for UI updates)
+            NotificationCenter.default.post(name: NSNotification.Name("AIMoveMade"), object: nil)
         }
     }
     
@@ -90,6 +106,62 @@ class GameModel {
         let availableMoves = getAvailableMoves()
         guard !availableMoves.isEmpty else { return -1 }
         return availableMoves.randomElement() ?? -1
+    }
+    
+    private func getOnlineAIMove() -> Int {
+        print("🌐 Online AI move requested - calling OpenAI API...")
+        
+        // Use semaphore to make async call synchronous for this context
+        let semaphore = DispatchSemaphore(value: 0)
+        var aiMove = -1
+        
+        OpenAIManager.shared.getAIMove(for: board) { result in
+            switch result {
+            case .success(let position):
+                print("✅ OpenAI responded with position: \(position)")
+                // Validate the move is legal
+                if position >= 0 && position < 9 && self.board[position] == nil {
+                    aiMove = position
+                } else {
+                    print("⚠️ OpenAI suggested invalid move \(position), using fallback")
+                    aiMove = self.getMinimaxMove()
+                }
+            case .failure(let error):
+                print("❌ OpenAI API error: \(error.localizedDescription)")
+                print("🔄 Falling back to local minimax AI")
+                aiMove = self.getMinimaxMove()
+            }
+            semaphore.signal()
+        }
+        
+        // Wait for API response (with timeout)
+        let timeoutResult = semaphore.wait(timeout: .now() + 10.0)
+        
+        if timeoutResult == .timedOut {
+            print("⏰ OpenAI API timed out, using fallback")
+            return getMinimaxMove()
+        }
+        
+        return aiMove
+    }
+    
+    // MARK: - Future API Integration Helper Methods
+    
+    private func boardToAPIFormat() -> [String] {
+        // Convert board state to format expected by API
+        return board.map { player in
+            switch player {
+            case .X: return "X"
+            case .O: return "O"
+            case nil: return ""
+            }
+        }
+    }
+    
+    private func apiResponseToPosition(_ response: [String: Any]) -> Int {
+        // Parse API response and extract move position
+        // This will be implemented when we add the actual API
+        return -1
     }
     
     private func getMinimaxMove() -> Int {

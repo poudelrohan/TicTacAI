@@ -95,6 +95,15 @@ iOSInjectionProject/
 config.json
 secrets.plist
 
+# API Keys and Secrets - CRITICAL SECURITY
+Config.swift
+APIKeys.swift
+Secrets.swift
+*.apikey
+random.md
+*.temp
+*.tmp
+
 # OS generated files
 .DS_Store
 .DS_Store?

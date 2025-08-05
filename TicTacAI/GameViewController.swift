@@ -34,14 +34,54 @@ class GameViewController: UIViewController {
     // MARK: - Properties
     var gameMode: GameMode = .twoPlayer
     private var gameModel: GameModel!
+    private var loadingIndicator: UIActivityIndicatorView!
+    private var aiThinkingLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupGame()
         setupUI()
+        setupLoadingIndicator()
+        
+        // Listen for AI moves
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(aiMoveMade),
+            name: NSNotification.Name("AIMoveMade"),
+            object: nil
+        )
+        
+        // Listen for AI loading states
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(showAILoading),
+            name: NSNotification.Name("ShowAILoading"),
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(hideAILoading),
+            name: NSNotification.Name("HideAILoading"),
+            object: nil
+        )
         
         // Comprehensive connection diagnostics
         checkConnections()
+    }
+    
+    @objc private func aiMoveMade() {
+        DispatchQueue.main.async {
+            self.updateBoardUI()
+            self.updateGameStatus()
+            
+            // Check if game ended after AI move
+            if case .won(_) = self.gameModel.gameState {
+                self.showGameEndAlert()
+            } else if case .draw = self.gameModel.gameState {
+                self.showGameEndAlert()
+            }
+        }
     }
     
     private func checkConnections() {
@@ -104,15 +144,46 @@ class GameViewController: UIViewController {
         restartButton.setTitleColor(.white, for: .normal)
         restartButton.layer.cornerRadius = 8
         restartButton.setTitle("Restart", for: .normal)
+        // Add programmatic action as backup
+        restartButton.addTarget(self, action: #selector(restartButtonTappedProgrammatically), for: .touchUpInside)
         
         // Configure home button
         homeButton.backgroundColor = .systemGray
         homeButton.setTitleColor(.white, for: .normal)
         homeButton.layer.cornerRadius = 8
         homeButton.setTitle("Home", for: .normal)
+        // Add programmatic action as backup
+        homeButton.addTarget(self, action: #selector(homeButtonTappedProgrammatically), for: .touchUpInside)
         
         // Setup board buttons
         setupBoardButtons()
+    }
+    
+    private func setupLoadingIndicator() {
+        // Create loading indicator
+        loadingIndicator = UIActivityIndicatorView(style: .large)
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.hidesWhenStopped = true
+        view.addSubview(loadingIndicator)
+        
+        // Create "AI Thinking" label
+        aiThinkingLabel = UILabel()
+        aiThinkingLabel.text = "🌐 Online AI is thinking..."
+        aiThinkingLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        aiThinkingLabel.textAlignment = .center
+        aiThinkingLabel.textColor = .systemBlue
+        aiThinkingLabel.translatesAutoresizingMaskIntoConstraints = false
+        aiThinkingLabel.isHidden = true
+        view.addSubview(aiThinkingLabel)
+        
+        // Layout constraints
+        NSLayoutConstraint.activate([
+            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            aiThinkingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            aiThinkingLabel.topAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 16)
+        ])
     }
     
     private func setupBoardButtons() {
@@ -222,6 +293,8 @@ class GameViewController: UIViewController {
             return player == .X ? StatisticsManager.shared.playerXName : StatisticsManager.shared.playerOName
         case .singlePlayerEasy, .singlePlayerHard:
             return player == .X ? "You" : "AI"
+        case .singlePlayerOnline:
+            return player == .X ? "You" : "Online AI"
         }
     }
     
@@ -252,20 +325,66 @@ class GameViewController: UIViewController {
     }
     
     @IBAction func restartButtonTapped(_ sender: UIButton) {
+        print("🔄 Restart button tapped!")
         restartGame()
     }
     
     @IBAction func homeButtonTapped(_ sender: UIButton) {
+        print("🏠 Home button tapped!")
+        goHome()
+    }
+    
+    // MARK: - Programmatic Button Actions (Backup)
+    @objc private func restartButtonTappedProgrammatically() {
+        print("🔄 Restart button tapped programmatically!")
+        restartGame()
+    }
+    
+    @objc private func homeButtonTappedProgrammatically() {
+        print("🏠 Home button tapped programmatically!")
         goHome()
     }
     
     private func restartGame() {
+        print("🔄 Restarting game...")
         gameModel.resetGame()
         updateBoardUI()
         updateGameStatus()
+        print("✅ Game restarted successfully")
     }
     
     private func goHome() {
-        navigationController?.popViewController(animated: true)
+        print("🏠 Navigating to home screen...")
+        if let navController = navigationController {
+            navController.popViewController(animated: true)
+            print("✅ Navigation initiated")
+        } else {
+            print("❌ Navigation controller is nil!")
+        }
+    }
+    
+    // MARK: - Loading Indicator Methods
+    @objc private func showAILoading() {
+        DispatchQueue.main.async {
+            self.loadingIndicator.startAnimating()
+            self.aiThinkingLabel.isHidden = false
+            
+            // Disable board interaction during AI thinking
+            for button in self.boardButtons {
+                button.isEnabled = false
+            }
+        }
+    }
+    
+    @objc private func hideAILoading() {
+        DispatchQueue.main.async {
+            self.loadingIndicator.stopAnimating()
+            self.aiThinkingLabel.isHidden = true
+            
+            // Re-enable board interaction
+            for button in self.boardButtons {
+                button.isEnabled = true
+            }
+        }
     }
 }

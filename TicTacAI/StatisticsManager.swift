@@ -77,7 +77,7 @@ class StatisticsManager {
                 } else {
                     twoPlayerWinsO += 1
                 }
-            case .singlePlayerEasy, .singlePlayerHard:
+            case .singlePlayerEasy, .singlePlayerHard, .singlePlayerOnline:
                 if player == .X {
                     singlePlayerWins += 1
                 } else {
@@ -108,5 +108,11 @@ class StatisticsManager {
     
     var singlePlayerTotalGames: Int {
         return singlePlayerWins + singlePlayerLosses
+    }
+    
+    // MARK: - Player Name Management
+    func updatePlayerNames(playerX: String, playerO: String) {
+        playerXName = playerX
+        playerOName = playerO
     }
 }
