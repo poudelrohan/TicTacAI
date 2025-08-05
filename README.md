@@ -14,11 +14,12 @@ A modern UIKit-based iOS tic-tac-toe game with AI opponents.
 
 ## Screenshots
 
-*(Add screenshots of your app here)*
+_(Add screenshots of your app here)_
 
 ## Architecture
 
 ### MVC Pattern
+
 The app follows the Model-View-Controller design pattern:
 
 - **Model**: `GameModel.swift`, `StatisticsManager.swift`
@@ -28,12 +29,14 @@ The app follows the Model-View-Controller design pattern:
 ### Key Components
 
 1. **GameModel**: Core game logic including:
+
    - Board state management
    - Move validation
    - Win/draw detection
    - AI implementation (random and minimax)
 
 2. **StatisticsManager**: Persistent data storage using UserDefaults:
+
    - Player names
    - Win/loss statistics
    - Game counts
@@ -47,10 +50,13 @@ The app follows the Model-View-Controller design pattern:
 ## AI Implementation
 
 ### Easy Mode
+
 Uses random move selection from available positions.
 
 ### Hard Mode
+
 Implements the Minimax algorithm:
+
 - Recursively evaluates all possible game states
 - Chooses optimal moves to maximize AI's chances
 - Provides challenging gameplay (AI never loses)
@@ -58,6 +64,7 @@ Implements the Minimax algorithm:
 ## Data Persistence
 
 Statistics are stored using UserDefaults with the following keys:
+
 - Player names: `playerXName`, `playerOName`
 - Two-player stats: `twoPlayerWinsX`, `twoPlayerWinsO`
 - Single-player stats: `singlePlayerWins`, `singlePlayerLosses`
@@ -70,6 +77,7 @@ Statistics are stored using UserDefaults with the following keys:
 3. Build and run on your iOS device or simulator
 
 ### Requirements
+
 - iOS 13.0+
 - Xcode 12.0+
 - Swift 5.0+
@@ -117,6 +125,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author
 
 **Rohan Poudel**
+
 - GitHub: [@rohanpoudel](https://github.com/rohanpoudel)
 
 ## Acknowledgments

@@ -22,7 +22,24 @@ class HomeViewController: UIViewController {
     }
     
     private func setupUI() {
+        print("🏠 Setting up HomeViewController UI")
         title = "TicTacAI"
+        
+        // Check if outlets are connected
+        guard titleLabel != nil else {
+            print("❌ ERROR: titleLabel is not connected!")
+            return
+        }
+        
+        guard singlePlayerButton != nil && multiplayerButton != nil && 
+              statisticsButton != nil && settingsButton != nil else {
+            print("❌ ERROR: Some buttons are not connected!")
+            print("   singlePlayerButton: \(singlePlayerButton != nil)")
+            print("   multiplayerButton: \(multiplayerButton != nil)")
+            print("   statisticsButton: \(statisticsButton != nil)")
+            print("   settingsButton: \(settingsButton != nil)")
+            return
+        }
         
         // Configure title label
         titleLabel.text = "TicTacAI"
@@ -34,6 +51,8 @@ class HomeViewController: UIViewController {
         setupButton(multiplayerButton, title: "Multiplayer", backgroundColor: .systemGreen)
         setupButton(statisticsButton, title: "Statistics", backgroundColor: .systemOrange)
         setupButton(settingsButton, title: "Settings", backgroundColor: .systemGray)
+        
+        print("✅ HomeViewController UI setup completed")
     }
     
     private func setupButton(_ button: UIButton, title: String, backgroundColor: UIColor) {
@@ -50,18 +69,22 @@ class HomeViewController: UIViewController {
     
     // MARK: - IBActions
     @IBAction func singlePlayerTapped(_ sender: UIButton) {
+        print("🎮 Single Player button tapped")
         showGameModeSelection()
     }
     
     @IBAction func multiplayerTapped(_ sender: UIButton) {
+        print("👥 Multiplayer button tapped")
         navigateToGame(mode: .twoPlayer)
     }
     
     @IBAction func statisticsTapped(_ sender: UIButton) {
+        print("📊 Statistics button tapped")
         navigateToStatistics()
     }
     
     @IBAction func settingsTapped(_ sender: UIButton) {
+        print("⚙️ Settings button tapped")
         navigateToSettings()
     }
     
@@ -89,10 +112,28 @@ class HomeViewController: UIViewController {
     }
     
     private func navigateToGame(mode: GameMode) {
+        print("🎯 Attempting to navigate to GameViewController with mode: \(mode)")
+        
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        if let gameVC = storyboard.instantiateViewController(withIdentifier: "GameViewController") as? GameViewController {
-            gameVC.gameMode = mode
-            navigationController?.pushViewController(gameVC, animated: true)
+        
+        do {
+            if let gameVC = storyboard.instantiateViewController(withIdentifier: "GameViewController") as? GameViewController {
+                print("✅ GameViewController instantiated successfully")
+                gameVC.gameMode = mode
+                
+                if let navController = navigationController {
+                    navController.pushViewController(gameVC, animated: true)
+                    print("✅ Navigation successful")
+                } else {
+                    print("❌ ERROR: navigationController is nil!")
+                }
+            } else {
+                print("❌ ERROR: Could not instantiate GameViewController")
+                print("   - Check Storyboard ID is set to 'GameViewController'")
+                print("   - Check Custom Class is set to 'GameViewController'")
+            }
+        } catch {
+            print("❌ ERROR in navigateToGame: \(error)")
         }
     }
     

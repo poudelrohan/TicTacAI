@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Player: String, CaseIterable {
+enum Player: String, CaseIterable, Equatable {
     case X = "X"
     case O = "O"
     
@@ -22,7 +22,7 @@ enum GameMode {
     case singlePlayerHard
 }
 
-enum GameState {
+enum GameState: Equatable {
     case ongoing
     case won(Player)
     case draw

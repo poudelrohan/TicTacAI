@@ -15,8 +15,21 @@ class GameViewController: UIViewController {
     @IBOutlet weak var restartButton: UIButton!
     @IBOutlet weak var homeButton: UIButton!
     
-    // Game board buttons (3x3 grid)
-    @IBOutlet var boardButtons: [UIButton]!
+    // Game board buttons (3x3 grid) - Individual outlets
+    @IBOutlet weak var button0: UIButton!
+    @IBOutlet weak var button1: UIButton!
+    @IBOutlet weak var button2: UIButton!
+    @IBOutlet weak var button3: UIButton!
+    @IBOutlet weak var button4: UIButton!
+    @IBOutlet weak var button5: UIButton!
+    @IBOutlet weak var button6: UIButton!
+    @IBOutlet weak var button7: UIButton!
+    @IBOutlet weak var button8: UIButton!
+    
+    // Computed property to create array from individual outlets
+    private var boardButtons: [UIButton] {
+        return [button0, button1, button2, button3, button4, button5, button6, button7, button8].compactMap { $0 }
+    }
     
     // MARK: - Properties
     var gameMode: GameMode = .twoPlayer
@@ -26,6 +39,53 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         setupGame()
         setupUI()
+        
+        // Comprehensive connection diagnostics
+        checkConnections()
+    }
+    
+    private func checkConnections() {
+        print("=== CONNECTION DIAGNOSTICS ===")
+        
+        // Check outlets
+        let buttons = boardButtons
+        print("📱 Board buttons connected: \(buttons.count) of 9")
+        print("🏷️ Current player label: \(currentPlayerLabel != nil ? "✅ Connected" : "❌ Not connected")")
+        print("📋 Game status label: \(gameStatusLabel != nil ? "✅ Connected" : "❌ Not connected")")
+        print("🔄 Restart button: \(restartButton != nil ? "✅ Connected" : "❌ Not connected")")
+        print("🏠 Home button: \(homeButton != nil ? "✅ Connected" : "❌ Not connected")")
+        
+        // Check individual button connections
+        print("\n📋 Individual Button Connections:")
+        print("  button0: \(button0 != nil ? "✅" : "❌")")
+        print("  button1: \(button1 != nil ? "✅" : "❌")")
+        print("  button2: \(button2 != nil ? "✅" : "❌")")
+        print("  button3: \(button3 != nil ? "✅" : "❌")")
+        print("  button4: \(button4 != nil ? "✅" : "❌")")
+        print("  button5: \(button5 != nil ? "✅" : "❌")")
+        print("  button6: \(button6 != nil ? "✅" : "❌")")
+        print("  button7: \(button7 != nil ? "✅" : "❌")")
+        print("  button8: \(button8 != nil ? "✅" : "❌")")
+        
+        // Check board button details
+        if buttons.count > 0 {
+            print("\n📋 Board Button Details:")
+            for (index, button) in buttons.enumerated() {
+                print("  Button \(index): Tag = \(button.tag), Title = '\(button.title(for: .normal) ?? "nil")'")
+            }
+        }
+        
+        // Check if all tags are unique and correct
+        if buttons.count == 9 {
+            let tags = buttons.map { $0.tag }.sorted()
+            let expectedTags = Array(0...8)
+            print("\n🏷️ Tag Analysis:")
+            print("  Expected: \(expectedTags)")
+            print("  Actual:   \(tags)")
+            print("  Tags correct: \(tags == expectedTags ? "✅ Yes" : "❌ No")")
+        }
+        
+        print("=== END DIAGNOSTICS ===\n")
     }
     
     private func setupGame() {
@@ -56,7 +116,15 @@ class GameViewController: UIViewController {
     }
     
     private func setupBoardButtons() {
-        for (index, button) in boardButtons.enumerated() {
+        let buttons = boardButtons
+        print("✅ Setting up \(buttons.count) board buttons")
+        
+        guard buttons.count == 9 else {
+            print("❌ ERROR: Expected 9 buttons, got \(buttons.count). Check storyboard connections.")
+            return
+        }
+        
+        for (index, button) in buttons.enumerated() {
             button.tag = index
             button.backgroundColor = .systemBackground
             button.layer.borderWidth = 2
@@ -66,27 +134,51 @@ class GameViewController: UIViewController {
             button.setTitleColor(.label, for: .normal)
             button.setTitle("", for: .normal)
             button.addTarget(self, action: #selector(boardButtonTapped(_:)), for: .touchUpInside)
+            
+            print("  Configured button \(index) with tag \(button.tag)")
         }
     }
     
     @objc private func boardButtonTapped(_ sender: UIButton) {
+        print("🎯 Board button tapped: \(sender.tag)")
+        
+        guard gameModel != nil else {
+            print("❌ ERROR: gameModel is nil!")
+            return
+        }
+        
         let position = sender.tag
         
-        if gameModel.makeMove(at: position) {
-            updateBoardUI()
-            updateGameStatus()
-            
-            // Check if game ended
-            if case .won(_) = gameModel.gameState {
-                showGameEndAlert()
-            } else if case .draw = gameModel.gameState {
-                showGameEndAlert()
+        do {
+            if gameModel.makeMove(at: position) {
+                print("✅ Move successful at position \(position)")
+                updateBoardUI()
+                updateGameStatus()
+                
+                // Check if game ended
+                if case .won(_) = gameModel.gameState {
+                    showGameEndAlert()
+                } else if case .draw = gameModel.gameState {
+                    showGameEndAlert()
+                }
+            } else {
+                print("⚠️ Move rejected at position \(position)")
             }
+        } catch {
+            print("❌ ERROR in boardButtonTapped: \(error)")
         }
     }
     
     private func updateBoardUI() {
-        for (index, button) in boardButtons.enumerated() {
+        print("🔄 Updating board UI...")
+        
+        let buttons = boardButtons
+        guard buttons.count == 9 else {
+            print("❌ ERROR: Expected 9 buttons for board UI update, got \(buttons.count)")
+            return
+        }
+        
+        for (index, button) in buttons.enumerated() {
             if let player = gameModel.getPlayer(at: index) {
                 button.setTitle(player.rawValue, for: .normal)
                 button.setTitleColor(player == .X ? .systemBlue : .systemRed, for: .normal)
@@ -96,6 +188,7 @@ class GameViewController: UIViewController {
                 button.isEnabled = gameModel.gameState == .ongoing
             }
         }
+        print("✅ Board UI updated successfully")
     }
     
     private func updateGameStatus() {
