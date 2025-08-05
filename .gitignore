@@ -89,17 +89,17 @@ fastlane/test_output
 
 iOSInjectionProject/
 
-# Sensitive files
-*.env
-.env
-config.json
-secrets.plist
-
-# API Keys and Secrets - CRITICAL SECURITY
+# Configuration files (sensitive)
 Config.swift
 APIKeys.swift
 Secrets.swift
 *.apikey
+
+# Documentation and notes (development only)
+API_SETUP.md
+Statistics_UI_Guide.md
+
+# Temporary files
 random.md
 *.temp
 *.tmp
