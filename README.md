@@ -13,7 +13,7 @@
 
 ### Description
 
-TicTacAI is a modern iOS tic-tac-toe game that combines classic gameplay with cutting-edge AI technology. Players can enjoy local two-player matches or challenge themselves against four different AI opponents: Easy (random moves), Hard (unbeatable Minimax algorithm), and Online (OpenAI GPT-3.5-turbo integration). The app features comprehensive statistics tracking, customizable settings, and a clean UIKit interface designed for quick, engaging gameplay sessions.
+TicTacAI is a modern iOS tic-tac-toe game that combines classic gameplay with cutting-edge AI technology. Players can enjoy local two-player matches or challenge themselves against three different AI opponents: Easy (random moves), Hard (unbeatable Minimax algorithm), and Online (OpenAI GPT-3.5-turbo integration). The app features comprehensive statistics tracking, customizable settings, and a clean UIKit interface designed for quick, engaging gameplay sessions.
 
 ### App Evaluation
 
@@ -40,13 +40,7 @@ TicTacAI is a modern iOS tic-tac-toe game that combines classic gameplay with cu
 - User can view comprehensive statistics of their gameplay
 - User can access settings to customize their experience
 
-**Optional Nice-to-have Stories**
 
-- User can customize player names for personalized experience
-- User can reset statistics to start fresh
-- User can see their win/loss ratio and game history trends
-- User can enjoy enhanced AI that makes strategic and creative moves via OpenAI integration
-- User can experience different AI personalities and difficulty progressions
 
 **Future Features (Not Yet Implemented)**
 
@@ -111,8 +105,7 @@ TicTacAI is a modern iOS tic-tac-toe game that combines classic gameplay with cu
 
 <!-- TODO: Add hand sketched wireframes here -->
 
-[Add picture of your hand sketched wireframes in this section]
-<img src="YOUR_WIREFRAME_IMAGE_URL" width=600>
+<img src="https://github.com/poudelrohan/TicTacAI/blob/16e10f3de76d2a3c0398fdade2f30f86c37f2481/IMG_0685.jpg" width=600>
 
 <!-- Note: Need to hand draw the following screens:
 1. Home Screen with mode selection buttons
@@ -120,9 +113,7 @@ TicTacAI is a modern iOS tic-tac-toe game that combines classic gameplay with cu
 3. Statistics Screen with win/loss data
 4. Settings Screen with toggle options -->
 
-### [BONUS] Digital Wireframes & Mockups
 
-### [BONUS] Interactive Prototype
 
 ## Schema
 
@@ -136,6 +127,16 @@ TicTacAI is a modern iOS tic-tac-toe game that combines classic gameplay with cu
 | GameState         | ongoing, won(Player), draw (enum)                                                 | Current state of the game                     |
 | StatisticsManager | playerXName, playerOName, various win/loss counters                               | Persistent statistics using UserDefaults      |
 
+## Video Walkthrough
+
+  <div>
+    <a href="https://www.loom.com/share/f9b27e05ff104ab1af9882e70607770f">
+    </a>
+    <a href="https://www.loom.com/share/f9b27e05ff104ab1af9882e70607770f">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/f9b27e05ff104ab1af9882e70607770f-6fd3a4173e93689a-full-play.gif">
+    </a>
+  </div>
+  
 ### Networking
 
 **OpenAI Integration (Online AI Mode)**
