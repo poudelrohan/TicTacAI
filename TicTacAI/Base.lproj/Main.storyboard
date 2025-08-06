@@ -13,7 +13,7 @@
         <scene sceneID="5V1-4U-Kfn">
             <objects>
                 <navigationController id="AxR-Mi-Wy4" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" hidden="YES" contentMode="scaleToFill" id="WXo-c5-YKF">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="WXo-c5-YKF">
                         <rect key="frame" x="0.0" y="118" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
